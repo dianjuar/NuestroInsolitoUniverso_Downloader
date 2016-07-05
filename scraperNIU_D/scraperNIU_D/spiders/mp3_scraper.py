@@ -10,8 +10,7 @@ class Mp3ScraperSpider(scrapy.Spider):
 	name = "mp3_scraper"
 	allowed_domains = ["ondalasuperestacion.com"]
 	start_urls = (
-		# 'http://ondalasuperestacion.com/category/categorias-principal/micros-categorias-principal/insolito-universo/',
-		'http://ondalasuperestacion.com/category/categorias-principal/micros-categorias-principal/insolito-universo/page/2/'
+		'http://ondalasuperestacion.com/category/categorias-principal/micros-categorias-principal/insolito-universo',
 	)
 
 	def __init__(self):
@@ -39,12 +38,18 @@ class Mp3ScraperSpider(scrapy.Spider):
 			# print(url)
 			url = response.urljoin( str(url) )
 			# print(url)
-			# yield Request( url, callback=self.parse_post )
+			yield Request( url, callback=self.parse_post )
 
 		# the next links ->
-		# nextlink = base.xpath('./section/div[@class="row"][2]/div[@class="col-xs-1 navlinks"]//a').extract()
-		# print( len(nextlink) )
+		nextlink = base.xpath('./section/div[@class="row"][2]/div[@class="col-xs-1 navlinks"]//a[child::i[@class="fa fa-arrow-circle-right"]]/@href').extract()
 
+		if len(nextlink) == 1 :
+			nextlink = response.urljoin( nextlink[0] )
+			yield Request( nextlink, callback=self.parse )
+		else:
+			print("*******************************")
+			print("End of the jorney little hobbit")
+			print("*******************************")
 
 	def parse_post(self, response):
 		hxs = Selector(response)
